@@ -12,7 +12,7 @@ In order for Selenium to work, it needs a webdriver. The driver depends on the b
 #### Windows
 Path can be found by going to the *Control Panel*, then searching for *environmental variables*.
 
-### MacOS/Linus
+#### MacOS/Linux
 
 In the terminal, use the command echo $PATH
 
