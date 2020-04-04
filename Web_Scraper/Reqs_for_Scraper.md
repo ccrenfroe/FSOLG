@@ -6,7 +6,8 @@
 
 [Selenium](https://selenium-python.readthedocs.io/)
 
-[Requests] (https://requests.readthedocs.io/en/master/)
+[Requests] (https://requests.readthedocs.io/en/master/user/install/#install)\
+
 ## Webdriver
 In order for Selenium to work, it needs a webdriver. The driver depends on the browser you want to use, and are referenced to by the Selenium docs [here](https://selenium-python.readthedocs.io/installation.html#drivers). **Make sure to add it to your PATH.**
 
