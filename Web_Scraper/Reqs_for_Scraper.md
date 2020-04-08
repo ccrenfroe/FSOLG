@@ -25,3 +25,6 @@ An example case: Using selenium with Firefox on Linux. Installation done with [t
 ## Sources
 https://towardsdatascience.com/data-science-skills-web-scraping-javascript-using-python-97a29738353f
 
+
+## TODO
+*Test scraper with geckodriver (firefox)
