@@ -9,7 +9,7 @@
 [Requests](https://requests.readthedocs.io/en/master/user/install/#install/)
 
 ## Webdriver
-In order for Selenium to work, it needs a webdriver. The driver depends on the browser you want to use, and are referenced to by the Selenium docs [here](https://selenium-python.readthedocs.io/installation.html#drivers). **Make sure to add it to your PATH.**
+In order for Selenium to work, it needs a webdriver. This program will be run using the Chromedriver for extra speed compared to the other drivers. [here](https://selenium-python.readthedocs.io/installation.html#drivers). **Make sure to add it to your PATH.**
 
 If the executable file is not in an executable path, it can be fined in the python script itself. It is listed under *Global Variables* with the variable name *driver*. Enter the path between the parentheses as *executable_path = '(PATH HERE)'*
 
