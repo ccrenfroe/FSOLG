@@ -20,7 +20,7 @@ Path can be found by going to the *Control Panel*, then searching for *environme
 
 In the terminal, use the command echo $PATH
 
-An example case: Using selenium with Firefox on Linux. Installation done with [this](https://askubuntu.com/questions/870530/how-to-install-geckodriver-in-ubuntu) quICK guide.
+An example case: Using selenium with Firefox on Linux. Installation done with [this](https://askubuntu.com/questions/870530/how-to-install-geckodriver-in-ubuntu) quick guide.
 
 ## Sources
 https://towardsdatascience.com/data-science-skills-web-scraping-javascript-using-python-97a29738353f
