@@ -32,10 +32,14 @@ is installed locally. The following steps should allow for running the CLI.
 
 ## Sources
 https://docs.python.org/3/library/
+
 https://github.com/pallets/click
+
 https://github.com/pwaller/pyfiglet/
 
 ## TODO
 *Integrate CLI with web scraper and machine learning components
+
 *Usability tests to determine quality of interaction with CLI
+
 *Evaluation from customers to determine if CLI matches their expectations (CLI affords rapid changes)
