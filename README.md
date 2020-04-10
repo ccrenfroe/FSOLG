@@ -10,7 +10,7 @@ The Fantasy Sports Optimal Lineup Generator is a multi-faceted command line prog
  - Machine Learning component requires development to a great degree
  - Connection between each component to a single FSOLG application
 
-# Dependecies
+# Dependencies
 
 Optimal installation of the FSOLG system ocurrs inside of linux terminals utilizing pip.
  - Python 3.8 is required to compile and run
