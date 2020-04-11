@@ -4,7 +4,7 @@ The Fantasy Sports Optimal Lineup Generator is a multi-faceted command line prog
 
 # Implemented Features
  - Command Line Interface component is fully functional outside of integration with web scraper and machine learning components
- - Web scraper ...
+ - Web scraper implementation is near complete. The initialization of the CSVs for teams and players is done, and now the data collection is all that is required. Estimated to be able to scrape by 4/11/2020
  
 # Not Yet Implemented Features
  - Machine Learning component requires development to a great degree
