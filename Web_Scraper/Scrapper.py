@@ -6,6 +6,7 @@
 import pandas
 from selenium import webdriver
 import time
+from datetime import  datetime as dt
 import csv
 from bs4 import BeautifulSoup
 from datetime import date
@@ -29,7 +30,7 @@ PROGRAM_ROOT = str(Path(__file__).resolve().parent.parent)
 
 
 # Webdriver
-driver = webdriver.Chrome() # PLACE DRIVERS EXECUTABLE PATH HERE IN THIS FORM : ("PATH_HERE"). REFER TO THE INSTALLATION GUIDE.
+driver = webdriver.Chrome() # PLACE DRIVERS EXECUTABLE PATH HERE (IF NEEDED) IN THIS FORM : ("PATH_HERE"). REFER TO THE INSTALLATION GUIDE.
 
 def directory_builder():
     if (os.path.isdir(PROGRAM_ROOT + "/Data") == False):
@@ -150,6 +151,9 @@ def init_csvs():
                 writer.writerow(["position"])
                 writer.writerow(["height",height])
                 writer.writerow(["weight",weight])
+                writer.writerow(["Dates Scraped (Oldest to Newest","0001-01-01","0001-01-01"])
+                writer.writerow([""])
+                writer.writerow(['DATA'])
     return
 
 # Input   : Teams to check injury list for
@@ -161,45 +165,84 @@ def injury_update():
 # Output  : CSV files for players with data up to given amount of years
 # Purpose : General purpose scraper for large data.
 #TODO - Check if there exist players CSVs in the directory
-#     - Change to work iteratively over a number of years
-#     - Add some headers identifying what years have been scraped already in the CSV
+#     - Add some headers identifying the date range scraped already. Located in row 7 element 2 and 3
 def scrape(years = [str(date.today().year)]):
-    for file in os.listdir(PLAYERS_DIRECTORY):
-        filepath = (os.path.join(PLAYERS_DIRECTORY,file))
-        print(filepath)
-        with open(filepath,'r') as csvIn:
-            csvIn = csv.reader(csvIn)
-            csv_listified = list(csvIn)
-            print(csv_listified)
-            player_id = csv_listified[2][1]
-        print(player_id)
-        curr_year_stats_url = BASE_URL + "/players" + player_id + "gamelog/" + years[0]
-        print(curr_year_stats_url)
-        driver.get(curr_year_stats_url)
-        soup = BeautifulSoup(driver.page_source,'lxml')
-        if(soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}).find_all("tr") == None):
-            continue
-        else:
-            table_check = soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}).find_all("tr")
-        table_check = len(table_check)
-        df = pandas.read_html(driver.page_source)
-        if (table_check > 1):
-            curr_year_stats = df[7]
-        else:
-            curr_year_stats = df[0]
-        curr_year_stats = curr_year_stats.drop("Rk",1)
-        curr_year_stats = curr_year_stats.drop("G",1)
-        curr_year_stats = curr_year_stats.drop("Age",1)
-        print(curr_year_stats)
-        with open(filepath, 'a') as f:
-            curr_year_stats.to_csv(f, header = True)
+    i = 0
+    # Goes through each player and scrapes the stats for each year given by the input parameter.
+    for year in years:
+        for file in os.listdir(PLAYERS_DIRECTORY):
+            filepath = (os.path.join(PLAYERS_DIRECTORY,file))
+            #print(filepath) # testing output
+            with open(filepath,'r') as csvIn:
+                csvIn = csv.reader(csvIn)
+                csv_listified = list(csvIn)
+                #print(csv_listified) # testing output
+                player_id = csv_listified[2][1] # Needed to find the html webpages of the player
+                curr_newest_date = csv_listified[7][2] # Get the current most recent date
+                curr_newest_date = dt.strptime(curr_newest_date, "%Y-%m-%d").date()
+                curr_oldest_date = csv_listified[7][1] # Get the current oldest date
+                curr_oldest_date = dt.strptime(curr_oldest_date, "%Y-%m-%d").date()
+
+            #print(player_id) # testing output
+            curr_year_stats_url = BASE_URL + "/players" + player_id + "gamelog/" + str(year) # Build the URL string
+            #print(curr_year_stats_url) # testing output
+            driver.get(curr_year_stats_url)
+            soup = BeautifulSoup(driver.page_source,'lxml')
+            # Skips over this year if there are no tables found, as in there is no games the player played in this year.
+            if((soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}) == None) or (soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}).find_all("tr") == None )):
+                continue
+            else:
+                table_check = soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}).find_all("tr")
+            table_check = len(table_check) # Check for later step
+            df = pandas.read_html(driver.page_source) # Take in the whole table of stats for the player
+            # Depending on the layout of the page, the table is located at a different part in the df list. (This is the later step mentioned)
+            if (table_check > 1):
+                curr_year_stats = df[7]
+            else:
+                curr_year_stats = df[0]
+
+            #Drop unnecessary columns
+            curr_year_stats = curr_year_stats.drop("Rk",1)
+            curr_year_stats = curr_year_stats.drop("G",1)
+            curr_year_stats = curr_year_stats.drop("Age",1)
+
+            #Find the first and last date in the table
+            oldest_date = curr_year_stats.iloc[0]['Date']
+            oldest_date = dt.strptime(oldest_date,"%Y-%m-%d").date()
+            newest_date = curr_year_stats.iloc[-1]['Date']
+            newest_date = dt.strptime(newest_date,"%Y-%m-%d").date()
+
+
+            # Need to update the dates since one is different, So need to create a new csv. Check both at once first and then check individually.
+            print(csv_listified[7][2] + "Current Newest Date")
+            print(csv_listified[7][1] + "Current Oldest Date")
+            # Enters this loop if a new CSV needs to be created because the dates need to be updated.i = i + 1
+            if ((curr_newest_date  < newest_date) or (curr_oldest_date > oldest_date) or (str(curr_oldest_date == "0001-01-01"))):
+                if(curr_newest_date < newest_date): # Update the newest date if the newest date in the current table is a more recent date than the current
+                    csv_listified[7][2] = newest_date
+                if(curr_oldest_date > oldest_date): # Update the oldest date if the oldest date in the current table is older than the current
+                    csv_listified[7][1] = oldest_date
+                elif (str(curr_oldest_date) == "0001-01-01"): #Edge case for first Oldest date in.
+                    csv_listified[7][1] = oldest_date
+
+                # Create new CSV and copy all of the data over.
+                with open(filepath,'w') as newCSV:
+                    writer = csv.writer(newCSV)
+                    writer.writerows(csv_listified) # Write over the old data
+                    curr_year_stats.to_csv(newCSV, header = True) # Add the new table of data
+            else: # No update is needed so just append to the end.
+                with open(filepath, 'a') as f:
+                    curr_year_stats.to_csv(f, header = True) # Append the new table of data to the CSV file
+    i = i + 1
+    print(str(i) + " of 496 done")
     return
+
 # Testing
 # Running time test
 start_time = time.time()
 TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
 #test_init = init_csvs()
-test_scrape = scrape()
+test_scrape = scrape([2018,2019])
 print("Execution time: " + str((time.time() - start_time)))
 
 #TODO
