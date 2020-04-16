@@ -1,0 +1,5 @@
+# FSOLG 4/12/2020
+## Time
+2 1/2 hours
+## Notes
+Updated scrapper to update the CSVs to keep track of the most recently scraped date and oldest scraped date. This should allow for some functionality for the user to keep track of what has and hasn't been scraped. Also emailed Dave and Don on our progress, letting them know the web scraper is functional and that Colin and I are moving on to implementing the Machine Learning part. Attached an example CSV for them to look at and give feedback on waht they want to keep and what data they don't find important, don't care if we keep or not, etc.. Furthermore asked them if they want some improved way of keeping track of what has been scraped and a check to keep them from scraping something that may have already been scraped, or if they deem it unnecessary and expect to be able to track it themselves. Next goal is to work on further improving the scraper to scrape x amount of games.
