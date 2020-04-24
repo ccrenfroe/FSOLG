@@ -6,7 +6,7 @@
 
 [Selenimum](https://selenium-python.readthedocs.io/)
 
-[Requests] (https://requests.readthedocs.io/en/master/)
+[Requests] (requests.readthedocs.io/en/master/)
 
 
 ## Webdriver
