@@ -30,7 +30,7 @@ PROGRAM_ROOT = str(Path(__file__).resolve().parent.parent)
 
 
 # Webdriver
-driver = webdriver.Chrome() # PLACE DRIVERS EXECUTABLE PATH HERE (IF NEEDED) IN THIS FORM : ("PATH_HERE"). REFER TO THE INSTALLATION GUIDE.
+driver = webdriver.Chrome()
 
 def directory_builder():
     if (os.path.isdir(PROGRAM_ROOT + "/Data") == False):
