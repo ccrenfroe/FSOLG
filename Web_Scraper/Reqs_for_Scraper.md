@@ -2,11 +2,11 @@
 
 
 ## Packages
-[Pandas] (https://pandas.pydata.org/)
+[Pandas](https://pandas.pydata.org/)
 
-[Selenimum] (https://selenium-python.readthedocs.io/)
+[Selenimum](https://selenium-python.readthedocs.io/)
 
-[Requests] (https://github.com/psf/requests)
+[Requests](https://github.com/psf/requests)
 
 
 ## Webdriver
@@ -31,9 +31,9 @@ Add the driver to your PATH so other tools can find it:
 ```
 export PATH=$PATH:/path-to-extracted-file/.
 ```
-Paraphrased from [this] (https://askubuntu.com/questions/870530/how-to-install-geckodriver-in-ubuntu)
+Paraphrased from [this](https://askubuntu.com/questions/870530/how-to-install-geckodriver-in-ubuntu)
 
 ## Mac
 I recommend using Chromium since it runs the fastest.
 
-[Guide] (https://www.kenst.com/2015/03/including-the-chromedriver-location-in-macos-system-path/)
+[Guide](https://www.kenst.com/2015/03/including-the-chromedriver-location-in-macos-system-path/)
