@@ -17,17 +17,17 @@ In order for Selenium to work, it needs a webdriver. The driver depends on the b
 Path can be found by going to the *Control Panel*, then searching for *environmental variables*.
 
 ## Linux 
-Extract the file with:
+- Extract the file with:
 ```
 tar -xvzf [driver_name]*
 ```
-Make it executable
+- Make it executable
 ```
 Make it executable:
 
 chmod +x [driver]
 ```
-Add the driver to your PATH so other tools can find it:
+- Add the driver to your PATH so other tools can find it:
 ```
 export PATH=$PATH:/path-to-extracted-file/.
 ```
@@ -35,5 +35,12 @@ Paraphrased from [this](https://askubuntu.com/questions/870530/how-to-install-ge
 
 ## Mac
 I recommend using Chromium since it runs the fastest.
+- Install the latest stable release of Chrome Driver [link](https://sites.google.com/a/chromium.org/chromedriver/downloads)
+- Move to **/usr/local/bin folder**
+- Go to downloads folder and unpack chromedriver file
+- Run this command : ** mv chromedriver /usr/local/bin **
 
-[Guide](https://www.kenst.com/2015/03/including-the-chromedriver-location-in-macos-system-path/)
+Paraphrased from [this](https://www.swtestacademy.com/install-chrome-driver-on-mac/)
+
+## After Installation
+Make sure to update your driver to whichever webdriver you chose. For example, if you chose Chrome Driver, make sure the driver is updated to webdriver.Chrome(). Refer to line 33, labeled Webdriver, in the Webscraper code.
