@@ -51,4 +51,4 @@ Paraphrased from [this](https://www.swtestacademy.com/install-chrome-driver-on-m
 Make sure to update your driver to whichever webdriver you chose. For example, if you chose Chrome Driver, make sure the driver is updated to webdriver.Chrome(). Refer to line 33, labeled Webdriver, in the Webscraper code.
 
 ## Troublshooting
-If difficulty arises with Python trying to find tHE Webdriver, refer to [this](http://jonathansoma.com/lede/foundations-2018/classes/selenium/selenium-snippets/) documentation
+If difficulty arises with Python trying to find the Webdriver, refer to [this](http://jonathansoma.com/lede/foundations-2018/classes/selenium/selenium-snippets/) documentation
