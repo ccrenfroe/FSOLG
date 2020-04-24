@@ -30,7 +30,7 @@ PROGRAM_ROOT = str(Path(__file__).resolve().parent.parent)
 
 
 # Webdriver
-driver = webdriver.Chrome()
+driver = webdriver.Chrome() # Add extension of whatever driver you are using. For example, I am using Chromium, so I have it as webdriver.Chrome(). If you are using firefox, it would be webdriver.Firefox().
 
 def directory_builder():
     if (os.path.isdir(PROGRAM_ROOT + "/Data") == False):
