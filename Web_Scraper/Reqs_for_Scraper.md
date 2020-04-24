@@ -15,4 +15,22 @@ In order for Selenium to work, it needs a webdriver. The driver depends on the b
 ### Windows
 Path can be found by going to the *Control Panel*, then searching for *environmental variables*.
 
-An example case: Using selenium with Firefox on Linux. Installation done with [this](https://askubuntu.com/questions/870530/how-to-install-geckodriver-in-ubuntu) quick guide.
+## Linux 
+[Pick a driver](https://selenium-python.readthedocs.io/installation.html#drivers)
+
+Extract the file with:
+```
+tar -xvzf [driver_name]*
+```
+Make it executable
+```
+Make it executable:
+
+chmod +x [driver]
+```
+Add the driver to your PATH so other tools can find it:
+```
+export PATH=$PATH:/path-to-extracted-file/.
+```
+Paraphrased from [this](https://askubuntu.com/questions/870530/how-to-install-geckodriver-in-ubuntu)
+
