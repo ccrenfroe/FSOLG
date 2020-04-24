@@ -2,11 +2,11 @@
 
 
 ## Packages
-[Pandas](https://pandas.pydata.org/)
+[Pandas]()
 
 [Selenimum](https://selenium-python.readthedocs.io/)
 
-[Requests] (https://github.com/psf/requests)
+[Requests] (https://pandas.pydata.org/)
 
 
 ## Webdriver
