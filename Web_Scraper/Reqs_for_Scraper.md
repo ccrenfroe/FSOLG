@@ -35,4 +35,5 @@ Paraphrased from [this](https://askubuntu.com/questions/870530/how-to-install-ge
 
 ## Mac
 I recommend using Chromium since it runs the fastest.
+
 [Guide] (https://www.kenst.com/2015/03/including-the-chromedriver-location-in-macos-system-path/)
