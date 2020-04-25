@@ -4,6 +4,7 @@
 ## Packages
 
 To install the required packages for the scraper, make sure you have pip, pythons package manager, installed. With pip, use the command "pip import [package name]"
+
 [Pandas](https://pandas.pydata.org/)
 
 [Selenimum](https://selenium-python.readthedocs.io/)
