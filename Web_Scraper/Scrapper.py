@@ -13,24 +13,16 @@ from datetime import date
 import os
 from pathlib import Path
 
-## Maybe keep these
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-
-
-
 # Global variables here
 DELAY = 5
 TOTAL_NBA_TEAMS = 30
 BASE_URL = "https://www.basketball-reference.com"
 TEAMS = ['ATL','BOS','BRK','CHO','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND', 'LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHO','POR','SAC','SAS','TOR','UTA','WAS'] # Current NBA teams. Abbreviations are according to basketball-reference.com
 PROGRAM_ROOT = str(Path(__file__).resolve().parent.parent)
-TEAMS_DIRECTORY, PLAYERS_DIRECTORY = None
+csvHeaders = ['Date','Team','Home/Away','Opp','Result Spread','Started','Minutes Played','FG','FGA','FG%','3P','3PA','3P%','FT','FTA','FT%','ORB','DRB','TRB','AST','STL','BLK','TOV','PF','PTS','GmSc','+/-']
 
 # Webdriver
-driver = webdriver.Chrome() # Add extension of whatever driver you are using. For example, I am using Chromium, so I have it as webdriver.Chrome(). If you are using firefox, it would be webdriver.Firefox().
+#driver = webdriver.Chrome() # Add extension of whatever driver you are using. For example, I am using Chromium, so I have it as webdriver.Chrome(). If you are using firefox, it would be webdriver.Firefox().
 
 def directory_builder():
     if (os.path.isdir(PROGRAM_ROOT + "/Data") == False):
@@ -46,6 +38,8 @@ def directory_builder():
 # Output : Outputs a new CSV for each team and players with basic data.
 # Purpose: Makes initial CSVs for every team and player. This is done when the user wants to start fresh. An example case could be if the user wants to start fresh for a new season.
 def init_csvs():
+    driver = webdriver.Chrome()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
     for team in TEAMS:
         # Building up the URL
         current_year = date.today().year
@@ -53,6 +47,7 @@ def init_csvs():
         print(team_url) # URL of current team
         driver.get(team_url) # Running the webdriver to get to the URL
         soup = BeautifulSoup(driver.page_source,'lxml') # lxml is a little faster, so opt for this instead of html.parser
+
 
         # Initializing the team CSVs
         team_name = soup.find("h1",{"itemprop":"name"}).find_all("span")[1].text # BeauitfulSoup parsing to find the team name
@@ -62,7 +57,7 @@ def init_csvs():
             injuries = df[1].loc[:,"Player"]
 
         # Create a CSV to append all od the gathered data to
-        with open(os.path.join(TEAMS_DIRECTORY, (team_name + '.csv')), 'w', newline='') as f: # Create a CSV for the current team
+        with open(os.path.join(TEAMS_DIRECTORY, (team_name + '.csv')), 'w', newline='', encoding='utf-8') as f: # Create a CSV for the current team
             writer = csv.writer(f) # Create a writer for the csv
             writer.writerow(["Roster"]) # Teams roster
             for player in team_roster: # Add each player
@@ -150,7 +145,7 @@ def init_csvs():
             experience = experience
 
             # Create a CSV to append all od the gathered data to
-            with open(os.path.join(PLAYERS_DIRECTORY, (player_name + '.csv')), 'w', newline='') as f:  # Create a CSV for the current team
+            with open(os.path.join(PLAYERS_DIRECTORY, (player_name + '.csv')), 'w', newline='', encoding='utf-8') as f:  # Create a CSV for the current team
                 writer = csv.writer(f)  # Create a writer for the csv
                 # Write to the CSV all of the gathered data
                 writer.writerow(["team",team_name])
@@ -161,9 +156,10 @@ def init_csvs():
                 writer.writerow(["height",height])
                 writer.writerow(["weight",weight])
                 writer.writerow(["Experience",experience])
-                writer.writerow(["Dates Scraped (Oldest to Newest","0001-01-01","0001-01-01"])
+                writer.writerow(["Dates Scraped (Oldest to Newest)","0001-01-01","0001-01-01"])
                 writer.writerow([""])
                 writer.writerow(['DATA'])
+                writer.writerow(csvHeaders)
     return
 
 # Input   : Teams to check injury list for
@@ -171,18 +167,20 @@ def init_csvs():
 # Purpose : Used to update the injuries in the Injuries csv and given teams csv's to allow for the user to check who is injured before a game to give them accurate results.
 def injury_update():
     return
-# Input   : Amount of years to scrape.
+# Input   : List of years to scrape.
 # Output  : CSV files for players with data up to given amount of years
 # Purpose : General purpose scraper for large data.
 #TODO - Check if there exist players CSVs in the directory
 #     - Add some headers identifying the date range scraped already. Located in row 7 element 2 and 3
 def scrape(years = [str(date.today().year)]):
+    driver = webdriver.Chrome()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
     # Goes through each player and scrapes the stats for each year given by the input parameter.
     for year in years:
         i = 0 # Counter to keep track of iterations
         for file in os.listdir(PLAYERS_DIRECTORY):
             filepath = (os.path.join(PLAYERS_DIRECTORY,file))
-            with open(filepath,'r') as csvIn:
+            with open(filepath,'r', encoding='utf-8') as csvIn:
                 csvIn = csv.reader(csvIn)
                 csv_listified = list(csvIn)
                 player_id = csv_listified[2][1] # Needed to find the html webpages of the player
@@ -244,17 +242,19 @@ def scrape(years = [str(date.today().year)]):
             #         curr_year_stats.to_csv(newCSV, header = True) # Add the new table of data
             ############################################################################################################################################################################
             with open(filepath, 'a') as f:
-                curr_year_stats.to_csv(f,index=False, header = True) # Append the new table of data to the CSV file
+                curr_year_stats.to_csv(f,index=False, header = False) # Append the new table of data to the CSV file
         print(str(i) + " of 496 done")
     return
 # Input   : Takes in a number of games to scrape and the year to start at.
 # Output  : Update the CSV with the amount of games requested
 # Purpose : Gives the user the ability to scrape a specific number of games as another scraping option.
 def scrape_games(games, year):
+    driver = webdriver.Chrome()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
     # Goes through each player and scrapes the stats for each year given by the input parameter.
     for file in os.listdir(PLAYERS_DIRECTORY):
         filepath = (os.path.join(PLAYERS_DIRECTORY, file))
-        with open(filepath, 'r') as csvIn:
+        with open(filepath, 'r', encoding='utf-8') as csvIn:
             csvIn = csv.reader(csvIn)
             csv_listified = list(csvIn)
             player_id = csv_listified[2][1]  # Needed to find the html webpages of the player
@@ -307,18 +307,30 @@ def scrape_games(games, year):
 
 
 def web_scrape(first_run, scrape_start, scrape_end, num_games, scrape_strat):
-    # Testing
-    # Running time test
+
     start_time = time.time()
-    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
-    test_init = init_csvs()
-    #test_scrape = scrape([2018,2019])
-    #test_game_scrape = scrape_games(110,2020)
+    if(first_run == True):
+        init_csvs()
+
+    if(scrape_strat == True):
+        scrape([scrape_start, scrape_end])
+
+    if(scrape_strat == False):
+        scrape_games(num_games, 2020)
+
     print("Execution time: " + str((time.time() - start_time)))
 
+def main():
+    start_time = time.time()
+    #init_csvs()
+    scrape([2020,2019,2018])
+    print("Execution time: " + str((time.time() - start_time)))
+
+
+if __name__ == '__main__':
+    main()
 #TODO
 # Scrape any info needed for the teams. Determine this with clients and Colin, taking out what will be unnecessary.
 # Write column headers during initialization instead of reading in headers
 # Scrape injuries
-# Integrate with a Main terminal program
 # Make sure to prompt the user that when they use the init functions, any existing CSVs will be overwritten.
