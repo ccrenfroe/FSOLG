@@ -1,4 +1,4 @@
-# Requirements for Command Line Interface
+# Requirements for FSOLG
 
 
 ## Packages and Dependencies
@@ -17,18 +17,18 @@ Formatting for text in console
 
 #### Instructions for Compilation
 
-The CLI can be simply ran in the Terminal within its contained domain and specifying "python CLI.py ..." as long as python 3.8
+The CLI can be simply ran in the Terminal within its contained domain and specifying "python FSOLG.py ..." as long as python 3.8
 is installed locally. The following steps should allow for running the CLI.
 
 - Installation of python 3.8 from https://www.python.org/downloads/
 - In terminal with python 3.8 set as the default version: 
     - "pip install click pyfiglet funcy"
-- Congrats! The CLI will run!
+- Congrats! The program will run!
 
 #### Instructions for Running
 
-- CD into the repo in which CLI.py is contained
-- Enter "CLI.py [OPTIONAL FLAGS]" in the console and hit enter!
+- CD into the repo in which FSOLG.py is contained
+- Enter "FSOLG.py [OPTIONAL FLAGS]" in the console and hit enter!
 
 ## Sources
 https://docs.python.org/3/library/
@@ -39,3 +39,4 @@ https://github.com/pwaller/pyfiglet/
 
 ## TODO
 
+* Connect the machine learning component

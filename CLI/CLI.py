@@ -6,13 +6,15 @@
 
 # python library which facilitates the construction of CLI
 import click
-# formatting library for title
-from pyfiglet import Figlet
 # library to assist in presentation of commands
 from funcy import identity
+# formatting library for title
+from pyfiglet import Figlet
 
-'''
-'''
+# Connecting to the web scraper
+from Scrapper import web_scrape
+
+
 def simple_CLI():
     """Generate a user friendly form of the CLI
     The function calls the other components and prints to console
@@ -28,7 +30,7 @@ def simple_CLI():
     print("A) Basketball \n"
           "B) Other")
     curr_input = input("\nEnter the letter of the option: ")
-    if curr_input == ('A').lower():
+    if curr_input.lower() == ('A').lower():
         current_sport = "Basketball"
     else:
         print("Other sports are not supported by FSOLG in the current version, defaulting to basketball")
@@ -42,17 +44,17 @@ def simple_CLI():
           "C) Generate a fantasy lineup")
     curr_input = input("\nEnter the letter of the option: ")
 
-    if curr_input == ("A").lower():
+    if curr_input.lower() == ("A").lower():
         print("Specified operation: Update Data")
         current_operation = "update"
         updateData()
 
-    elif curr_input == ("B").lower():
+    elif curr_input.lower() == ("B").lower():
         print("Specified operation : Retrain Machine Learning Algorithm")
         current_operation = "retrain"
         retrainData()
 
-    elif curr_input == ("C").lower():
+    elif curr_input.lower() == ("C").lower():
         print("Specified operation: Generate a fantasy lineup")
         current_operation = "generate"
         generateLineup()
@@ -72,11 +74,55 @@ def updateData():
 
     print("-----------------------------------------------------")
     print("")
-    print("How far back would you like to scrape data?")
-    scrape_size = input("Specify as a whole number of days:   ")
+    print("Is this the first time you are scraping for data?")
+    first_check = input("Yes or No?     ")
     print("-----------------------------------------------------")
-    # Web Sraping Component is connected here
-    # scrape(scrape_size)
+
+    if first_check.lower() == ("yes").lower():
+        first_time = True
+    elif first_check.lower() == ("no").lower():
+        first_time = False
+    else:
+        first_time = False
+
+    print("-----------------------------------------------------")
+    print("")
+    print("Would you like to scrape by date range or by number of games?")
+    scrape_check = input("(A) By date range "
+                         "(B) By number of games"
+                         ":   ")
+
+    if scrape_check.lower() == ("a").lower():
+        scrape_strat = True
+        num_games = 0;
+
+        print("-----------------------------------------------------")
+        print("")
+        print("Enter the year to begin data collection.")
+        scrape_start = input("Specify as a whole number year (Ex. '2020'):   ")
+        print("-----------------------------------------------------")
+
+        print("-----------------------------------------------------")
+        print("")
+        print("Enter the year to end data collection.")
+        scrape_end = input("Specify as a whole number year (Ex. '2020'):   ")
+        print("-----------------------------------------------------")
+
+        web_scrape(first_time, scrape_start, scrape_end, num_games, scrape_strat)
+
+    elif scrape_check.lower() == ("b").lower():
+        scrape_strat = False
+        scrape_start = 0
+        scrape_end = 0
+
+        print("-----------------------------------------------------")
+        print("")
+        print("Enter the number of games to scrape back for.")
+        num_games = input("Specify as a whole number year (Ex. '20'):   ")
+        print("-----------------------------------------------------")
+
+        web_scrape(first_time, scrape_start, scrape_end, num_games, scrape_strat)
+
 
 def retrainData():
     """Adjusting the current training and testing set

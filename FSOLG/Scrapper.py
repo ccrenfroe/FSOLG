@@ -27,10 +27,10 @@ TOTAL_NBA_TEAMS = 30
 BASE_URL = "https://www.basketball-reference.com"
 TEAMS = ['ATL','BOS','BRK','CHO','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND', 'LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHO','POR','SAC','SAS','TOR','UTA','WAS'] # Current NBA teams. Abbreviations are according to basketball-reference.com
 PROGRAM_ROOT = str(Path(__file__).resolve().parent.parent)
-TEAMS_DIRECTORY, PLAYERS_DIRECTORY = None
+
 
 # Webdriver
-driver = webdriver.Chrome() # Add extension of whatever driver you are using. For example, I am using Chromium, so I have it as webdriver.Chrome(). If you are using firefox, it would be webdriver.Firefox().
+#driver = webdriver.Chrome() # Add extension of whatever driver you are using. For example, I am using Chromium, so I have it as webdriver.Chrome(). If you are using firefox, it would be webdriver.Firefox().
 
 def directory_builder():
     if (os.path.isdir(PROGRAM_ROOT + "/Data") == False):
@@ -46,6 +46,8 @@ def directory_builder():
 # Output : Outputs a new CSV for each team and players with basic data.
 # Purpose: Makes initial CSVs for every team and player. This is done when the user wants to start fresh. An example case could be if the user wants to start fresh for a new season.
 def init_csvs():
+    driver = webdriver.Chrome()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
     for team in TEAMS:
         # Building up the URL
         current_year = date.today().year
@@ -177,6 +179,8 @@ def injury_update():
 #TODO - Check if there exist players CSVs in the directory
 #     - Add some headers identifying the date range scraped already. Located in row 7 element 2 and 3
 def scrape(years = [str(date.today().year)]):
+    driver = webdriver.Chrome()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
     # Goes through each player and scrapes the stats for each year given by the input parameter.
     for year in years:
         i = 0 # Counter to keep track of iterations
@@ -251,6 +255,8 @@ def scrape(years = [str(date.today().year)]):
 # Output  : Update the CSV with the amount of games requested
 # Purpose : Gives the user the ability to scrape a specific number of games as another scraping option.
 def scrape_games(games, year):
+    driver = webdriver.Chrome()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
     # Goes through each player and scrapes the stats for each year given by the input parameter.
     for file in os.listdir(PLAYERS_DIRECTORY):
         filepath = (os.path.join(PLAYERS_DIRECTORY, file))
@@ -307,18 +313,22 @@ def scrape_games(games, year):
 
 
 def web_scrape(first_run, scrape_start, scrape_end, num_games, scrape_strat):
-    # Testing
-    # Running time test
+
     start_time = time.time()
-    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
-    test_init = init_csvs()
-    #test_scrape = scrape([2018,2019])
-    #test_game_scrape = scrape_games(110,2020)
+
+    if(first_run == True):
+        init_csvs()
+
+    if(scrape_strat == True):
+        scrape([scrape_start, scrape_end])
+
+    if(scrape_strat == False):
+        scrape_games(num_games, 2020)
+
     print("Execution time: " + str((time.time() - start_time)))
 
 #TODO
 # Scrape any info needed for the teams. Determine this with clients and Colin, taking out what will be unnecessary.
 # Write column headers during initialization instead of reading in headers
 # Scrape injuries
-# Integrate with a Main terminal program
 # Make sure to prompt the user that when they use the init functions, any existing CSVs will be overwritten.
