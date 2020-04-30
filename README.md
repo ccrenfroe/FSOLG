@@ -3,12 +3,12 @@
 The Fantasy Sports Optimal Lineup Generator is a multi-faceted command line program constructed in order to facilitate the more efficient and effective production of fantasy sport lineups. It utilizes concurrent data collection via web scraping and the application of machine learning models to produce a statistic based selection of players that should optimize user success.
 
 # Implemented Features
- - Command Line Interface component is fully functional outside of integration with web scraper and machine learning components
- - Web scraper implementation is near complete. The initialization of the CSVs for teams and players is done, and now the data collection is all that is required. Estimated to be able to scrape by 4/11/2020
+ - Command Line Interface component is fully functional with web scraper and awaits connection to machine learning components
+ - Web scraper implementation is 99% complete. Bug fixes and injury reports need to be addressed.
  
 # Not Yet Implemented Features
  - Machine Learning component requires development to a great degree
- - Connection between each component to a single FSOLG application
+ - Connection between machine learning to the single FSOLG application
 
 # Dependencies
 
