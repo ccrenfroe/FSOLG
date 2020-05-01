@@ -122,7 +122,7 @@ def updateData():
         num_games = input("Specify as a whole number year (Ex. '20'):   ")
         print("-----------------------------------------------------")
 
-        web_scrape(first_time, scrape_start, scrape_end, num_games, scrape_strat)
+        web_scrape(first_time, int(scrape_start), int(scrape_end), int(num_games), scrape_strat)
 
 
 def retrainData():

@@ -6,7 +6,7 @@
 import pandas
 from selenium import webdriver
 import time
-from datetime import  datetime as dt
+from datetime import datetime as dt
 import csv
 from bs4 import BeautifulSoup
 from datetime import date
@@ -268,7 +268,7 @@ def scrape_games(games, year):
             soup = BeautifulSoup(driver.page_source, 'lxml')
             # Skips over this year if there are no tables found, as in there is no games the player played in this year.
             if ((soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}) == None) or (soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}).find_all("tr") == None)):
-                if experience == "Rookie": # If its a rookie and we find no gamelog for this year, that means they were never plaing this year to begin with, so set i to a high number to break the while loop check and move on to the next player.
+                if experience == "Rookie": # If its a rookie and we find no gamelog for this year, that means they were never playing this year to begin with, so set i to a high number to break the while loop check and move on to the next player.
                     i = 99999;
                 elif experience == "NA": # Same if the experience is NA
                     i = 99999;
