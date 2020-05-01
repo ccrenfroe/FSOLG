@@ -5,6 +5,8 @@
 # Imports here
 import pandas
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+
 import time
 from datetime import  datetime as dt
 import csv
@@ -12,6 +14,8 @@ from bs4 import BeautifulSoup
 from datetime import date
 import os
 from pathlib import Path
+import unidecode
+import time
 
 # Global variables here
 DELAY = 5
@@ -152,7 +156,7 @@ def init_csvs():
                 writer.writerow(["player webpage",player_url])
                 writer.writerow(["playerID",player_id])
                 writer.writerow(["full name",full_name])
-                writer.writerow(["position"])
+                writer.writerow(["position",position])
                 writer.writerow(["height",height])
                 writer.writerow(["weight",weight])
                 writer.writerow(["Experience",experience])
@@ -183,6 +187,7 @@ def scrape(years = [str(date.today().year)]):
             with open(filepath,'r', encoding='utf-8') as csvIn:
                 csvIn = csv.reader(csvIn)
                 csv_listified = list(csvIn)
+                print(csv_listified)
                 player_id = csv_listified[2][1] # Needed to find the html webpages of the player
 
                 ##LOW PRIORITY. IMPLEMENT LATER IF TIME.
@@ -284,7 +289,7 @@ def scrape_games(games, year):
                 curr_year_stats = df[7]
             else:
                 curr_year_stats = df[0]
-
+            
             # Drop unnecessary columns
             curr_year_stats = curr_year_stats.drop("G", 1)
             curr_year_stats = curr_year_stats.drop("Age", 1)
@@ -305,6 +310,81 @@ def scrape_games(games, year):
                     current_year = current_year - 1
                     years_done = years_done + 1
 
+def roto_test():
+    driver = webdriver.Chrome()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
+    for file in os.listdir(PLAYERS_DIRECTORY):
+        filepath = (os.path.join(PLAYERS_DIRECTORY, file))
+        with open(filepath, 'r', encoding='utf-8') as csvIn:
+            name = filepath.split('\\')[-1]
+            name = unidecode.unidecode(name).capitalize()
+
+            # This is done so that the program accounts for last names that include 2 parts, such as a Doe Jr.
+            name = name.split(" ",1)
+            first_name = name[0]
+            last_name = name[1]
+            last_name = last_name.split('.csv')[0].capitalize()
+            first_letter = last_name[0]
+            print(first_letter)
+            name = last_name + ", " + first_name
+            driver.get("http://rotoguru1.com/cgi-bin/playrh.cgi?0")
+            soup = BeautifulSoup(driver.page_source,'lxml') # lxml is a little faster, so opt for this instead of html.parser
+            # elements = driver.find_elements_by_name("guru_id")
+            # A_to_K_Select = elements[0]
+            # K_to_Z_Select = elements[1]
+            print("CURRENT PLAYER : " + name)
+
+            try:
+                A_to_K_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[1]/form/select")
+                K_to_Z_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[2]/form/select")
+            except:
+                time.sleep(1)
+                A_to_K_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[1]/form/select")
+                K_to_Z_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[2]/form/select")
+
+            print(ord(first_letter) < ord("L"))
+            if(ord(first_letter) < ord("L")):
+                # Name before L
+                for option in A_to_K_Select.find_elements_by_tag_name('option'):
+                    if  (name in option.text):
+                        option.click() # select() in earlier versions of webdriver
+                        print("Found" + option.text)
+                        driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[1]/form/input").click()
+                        df = pandas.read_html(driver.page_source)
+                        df = df[5]
+                        df = df.drop([0,1,2,3,5,6,7,8,9], axis = 0)
+                        df = df.drop([1,2,3,5,7,8], axis = 1)
+                        print(df)
+                        try:
+                            year = driver.find_element_by_xpath("/html/body/font/center/font/b").text
+                        except:
+                            time.sleep(1)
+                            year = driver.find_element_by_xpath("/html/body/font/center/font/b").text                        
+                        print(year)
+                        year = year.split(' ')[0]
+                        print(year)
+                        break
+            else:
+                # Name after L
+                for option in K_to_Z_Select.find_elements_by_tag_name('option'):
+                    if (name in option.text):
+                        option.click() # select() in earlier versions of webdriver
+                        print("Found" + option.text)
+                        driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[2]/form/input").click()
+                        df = pandas.read_html(driver.page_source)
+                        df = df[5]
+                        df = df.drop([0,1,2,3,5,6,7,8,9], axis = 0)
+                        df = df.drop([1,2,3,5,7,8], axis = 1)
+                        print(df)
+                        try:
+                            year = driver.find_element_by_xpath("/html/body/font/center/font/b").text
+                        except:
+                            time.sleep(1)
+                            year = driver.find_element_by_xpath("/html/body/font/center/font/b").text
+                        print(year)
+                        year = year.split(' ')[0]
+                        print(year)
+                        break
 
 def web_scrape(first_run, scrape_start, scrape_end, num_games, scrape_strat):
 
@@ -323,13 +403,13 @@ def web_scrape(first_run, scrape_start, scrape_end, num_games, scrape_strat):
 def main():
     start_time = time.time()
     #init_csvs()
-    scrape([2020,2019,2018])
+    #scrape([2020,2019,2018])
+    roto_test();
     print("Execution time: " + str((time.time() - start_time)))
-
-
+    
 if __name__ == '__main__':
     main()
-#TODO
+# TODO
 # Scrape any info needed for the teams. Determine this with clients and Colin, taking out what will be unnecessary.
 # Write column headers during initialization instead of reading in headers
 # Scrape injuries
