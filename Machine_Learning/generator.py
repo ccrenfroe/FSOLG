@@ -5,7 +5,6 @@ import pandas as pd
 from pathlib import Path
 
 #Constants
-
 WEEK = 4
 DOUBLE_WEEK = 8
 fieldnames = ['Started', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', 'FT', 'FTA', 'FT%', 'ORB',
