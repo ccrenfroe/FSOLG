@@ -1,6 +1,5 @@
 # Requirements for Web Scrapper
 
-
 ## Packages
 
 To install the required packages for the scraper, make sure you have pip, pythons package manager, installed. With pip, use the command "pip import [package name]"
@@ -9,49 +8,61 @@ To install the required packages for the scraper, make sure you have pip, python
 
 [Selenimum](https://selenium-python.readthedocs.io/)
 
-[Requests](https://github.com/psf/requests)
+[lxml](https://lxml.de/)
 
+[unidecode](https://pypi.org/project/Unidecode/)
 
-## Webdriver
+### Webdriver
+
 [Selenium Webdriver docs](https://selenium-python.readthedocs.io/installation.html)
-In order for Selenium to work, it needs a webdriver. The driver depends on the browser you want to use, and are referenced to by the Selenium docs [here](https://selenium-python.readthedocs.io/installation.html#drivers). ** Make sure to add it to your PATH. **
+In order for Selenium to work, it needs a webdriver. The driver depends on the browser you want to use, and are referenced to by the Selenium docs [here](https://selenium-python.readthedocs.io/installation.html#drivers). **Make sure to add it to your PATH.**
 
 I recommend using Chromium since it runs the fastest.
 
-## Windows
+### Windows
+
 Example using Chrome Driver
+
 - Install the latest stable release of Chrome Driver [link](https://sites.google.com/a/chromium.org/chromedriver/downloads)
 - Unzip the file
-- Move chromedriver.exe to C:\Windows. This will add it to your PATH since 
+- Move chromedriver.exe to C:\Windows. This will add it to your PATH.
 Path can be found by going to the *Control Panel*, then searching for *environmental variables*.
 
-## Linux 
+### Linux
+
 - Extract the file with:
-```
+
+```linux
 tar -xvzf [driver_name]*
 ```
-- Make it executable
-```
+
 Make it executable:
 
+```linux
 chmod +x [driver]
 ```
+
 - Add the driver to your PATH so other tools can find it:
-```
+
+```linux
 export PATH=$PATH:/path-to-extracted-file/.
 ```
+
 Paraphrased from [this](https://askubuntu.com/questions/870530/how-to-install-geckodriver-in-ubuntu)
 
 ## Mac
+
 - Install the latest stable release of Chrome Driver [link](https://sites.google.com/a/chromium.org/chromedriver/downloads)
 - Move to **/usr/local/bin folder**
 - Go to downloads folder and unpack chromedriver file
-- Run this command : ** mv chromedriver /usr/local/bin **
+- Run this command : **mv chromedriver /usr/local/bin**
 
 Paraphrased from [this](https://www.swtestacademy.com/install-chrome-driver-on-mac/)
 
 ## After Installation
+
 Make sure to update your driver to whichever webdriver you chose. For example, if you chose Chrome Driver, make sure the driver is updated to webdriver.Chrome(). Refer to line 33, labeled Webdriver, in the Webscraper code.
 
-## Troublshooting
+## Troubleshooting
+
 If difficulty arises with Python trying to find the Webdriver, refer to [this](http://jonathansoma.com/lede/foundations-2018/classes/selenium/selenium-snippets/) documentation
