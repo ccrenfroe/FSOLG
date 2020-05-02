@@ -5,13 +5,16 @@
 # Imports here
 import pandas
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 import time
-from datetime import datetime as dt
+from datetime import  datetime as dt
 import csv
 from bs4 import BeautifulSoup
 from datetime import date
 import os
 from pathlib import Path
+import unidecode
+import time
 
 # Global variables here
 DELAY = 5
@@ -30,16 +33,17 @@ def directory_builder():
         os.makedirs(PROGRAM_ROOT + '/Data/Basketball/')
         os.makedirs(PROGRAM_ROOT + '/Data/Basketball/Teams/')
         os.makedirs(PROGRAM_ROOT + '/Data/Basketball/Players/')
-        return ((PROGRAM_ROOT + '/Data/Basketball/Teams/'), (PROGRAM_ROOT + '/Data/Basketball/Players'))
+        os.makedirs(PROGRAM_ROOT + '/Data/Basketball/Salaries/')
+        return ((PROGRAM_ROOT + '/Data/Basketball/Teams/'), (PROGRAM_ROOT + '/Data/Basketball/Players/'), (PROGRAM_ROOT + '/Data/Basketball/Salaries/'))
     else: # Data directory exists
-        return ((PROGRAM_ROOT + '/Data/Basketball/Teams'), (PROGRAM_ROOT + '/Data/Basketball/Players'))
+        return ((PROGRAM_ROOT + '/Data/Basketball/Teams/'), (PROGRAM_ROOT + '/Data/Basketball/Players/'), (PROGRAM_ROOT + '/Data/Basketball/Salaries/'))
 
 # Input  : None
 # Output : Outputs a new CSV for each team and players with basic data.
 # Purpose: Makes initial CSVs for every team and player. This is done when the user wants to start fresh. An example case could be if the user wants to start fresh for a new season.
 def init_csvs():
     driver = webdriver.Chrome()
-    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY, SALARIES_DIRECTORY = directory_builder()
     for team in TEAMS:
         # Building up the URL
         current_year = date.today().year
@@ -142,7 +146,6 @@ def init_csvs():
             position = position.encode('ascii', 'ignore').strip()
             position = position.decode()
             experience = experience.strip()
-            experience = experience
 
             # Create a CSV to append all od the gathered data to
             with open(os.path.join(PLAYERS_DIRECTORY, (player_name + '.csv')), 'w', newline='', encoding='utf-8') as f:  # Create a CSV for the current team
@@ -152,7 +155,7 @@ def init_csvs():
                 writer.writerow(["player webpage",player_url])
                 writer.writerow(["playerID",player_id])
                 writer.writerow(["full name",full_name])
-                writer.writerow(["position"])
+                writer.writerow(["position",position])
                 writer.writerow(["height",height])
                 writer.writerow(["weight",weight])
                 writer.writerow(["Experience",experience])
@@ -174,7 +177,7 @@ def injury_update():
 #     - Add some headers identifying the date range scraped already. Located in row 7 element 2 and 3
 def scrape(years = [str(date.today().year)]):
     driver = webdriver.Chrome()
-    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY, SALARIES_DIRECTORY = directory_builder()
     # Goes through each player and scrapes the stats for each year given by the input parameter.
     for year in years:
         i = 0 # Counter to keep track of iterations
@@ -183,6 +186,7 @@ def scrape(years = [str(date.today().year)]):
             with open(filepath,'r', encoding='utf-8') as csvIn:
                 csvIn = csv.reader(csvIn)
                 csv_listified = list(csvIn)
+                print(csv_listified)
                 player_id = csv_listified[2][1] # Needed to find the html webpages of the player
 
                 ##LOW PRIORITY. IMPLEMENT LATER IF TIME.
@@ -250,7 +254,7 @@ def scrape(years = [str(date.today().year)]):
 # Purpose : Gives the user the ability to scrape a specific number of games as another scraping option.
 def scrape_games(games, year):
     driver = webdriver.Chrome()
-    TEAMS_DIRECTORY, PLAYERS_DIRECTORY = directory_builder()
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY, SALARIES_DIRECTORY= directory_builder()
     # Goes through each player and scrapes the stats for each year given by the input parameter.
     for file in os.listdir(PLAYERS_DIRECTORY):
         filepath = (os.path.join(PLAYERS_DIRECTORY, file))
@@ -268,7 +272,7 @@ def scrape_games(games, year):
             soup = BeautifulSoup(driver.page_source, 'lxml')
             # Skips over this year if there are no tables found, as in there is no games the player played in this year.
             if ((soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}) == None) or (soup.find("div", {"id": "game_log_summary_1", "class": "data_grid_box"}).find_all("tr") == None)):
-                if experience == "Rookie": # If its a rookie and we find no gamelog for this year, that means they were never playing this year to begin with, so set i to a high number to break the while loop check and move on to the next player.
+                if experience == "Rookie": # If its a rookie and we find no gamelog for this year, that means they were never plaing this year to begin with, so set i to a high number to break the while loop check and move on to the next player.
                     i = 99999;
                 elif experience == "NA": # Same if the experience is NA
                     i = 99999;
@@ -284,7 +288,7 @@ def scrape_games(games, year):
                 curr_year_stats = df[7]
             else:
                 curr_year_stats = df[0]
-
+            
             # Drop unnecessary columns
             curr_year_stats = curr_year_stats.drop("G", 1)
             curr_year_stats = curr_year_stats.drop("Age", 1)
@@ -305,32 +309,137 @@ def scrape_games(games, year):
                     current_year = current_year - 1
                     years_done = years_done + 1
 
+# Input   : Nothing.
+# Output  : Outputes csvs with their respective players historical data on their fantasy salaries in the "Salaries" folder.
+# Purpose : Allows for the gathering of the salaries to be used in the calculations and machine learning.
+def salary_scrape():
+    driver = webdriver.Chrome() # Start the driver up
+    TEAMS_DIRECTORY, PLAYERS_DIRECTORY, SALARIES_DIRECTORY = directory_builder()
+    for file in os.listdir(PLAYERS_DIRECTORY): # Go through each player
+        filepath = (os.path.join(PLAYERS_DIRECTORY, file))
+        with open(filepath, 'r', encoding='utf-8') as csvIn:
+            name = filepath.split('/')[-1] # Split the last part of the filepath to just get the csv part of the filepath.
+            name = unidecode.unidecode(name) # Gets rid of any special characters or letters with squigglies and apostrophes.
+            # This is done so that the program accounts for last names that include 2 parts, such as a Doe Jr.
+            # Bunch of operations to get the name formatted correctly to be compared against the names on the website
+            ####
+            name = name.split(" ",1)
+            first_name = name[0]
+            last_name = name[1]
+            last_name = last_name.split('.csv')[0].capitalize()
+            name = (last_name + ", " + first_name).upper() # Player name to be searched for on the website
+            first_letter = last_name[0] # This is used to determine which path to take later
+            #print(first_letter) testing output
+            filename = first_name + " " + last_name + " Salary.csv" # name of the file to be outputted with the data
+            #print(filename) testing output
+            driver.get("http://rotoguru1.com/cgi-bin/playrh.cgi?0") # Go to the root webpage
+            soup = BeautifulSoup(driver.page_source,'lxml') # lxml is a little faster, so opt for this instead of html.parser
 
+            #print("CURRENT PLAYER : " + name) testing output
+            #Try except block to try and find the select boxes again if they arent found on page load. Sometimes it needs to wait longer and then try again.
+            try:
+                A_to_K_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[1]/form/select")
+                K_to_Z_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[2]/form/select")
+            except:
+                time.sleep(1) # Waits one second and then tries to find the selects again.
+                A_to_K_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[1]/form/select")
+                K_to_Z_Select = driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[2]/form/select")
+
+            if(ord(first_letter) < ord("L")): # Compare the first letter of the name to L to determine which path to enter
+                # Name before L
+                for option in A_to_K_Select.find_elements_by_tag_name('option'): # Loop through each option until a match is found
+                    if option == None: # If no match is found, eventually will get a nonetype and then prompt to the user that the player could not be found
+                        print("PLAYER NOT LISTED")
+                        break
+                    if  (name in option.text.upper()): # If the name matches the current option
+                        option.click() # select the option 
+                        # print("Found " + option.text) Testing output
+                        driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[1]/form/input").click() # Click the go button to go to the players stats page.
+                        # Try except in case the element is not found on the first try
+                        try: # If the option is there and can be clicked, click it
+                            if(driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a").click()): # Expand to show the full season history
+                                driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a").click()
+                        except: # Try again after waiting 1 second.
+                            time.sleep(1)
+                            if(driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a").click()): # Expand to show the full season history
+                                driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a").click()
+                                #print("GOT IT IN THE ELSE LOOP") testing output
+                        # Same thing, tries again if the code fails on the first time
+                        try: # to data frame-ify the tables on the page
+                            df = pandas.read_html(driver.page_source)
+                            df = df[5] # The 5th table is the table needed
+                        except: # Wait 1 second and then try again
+                            time.sleep(1)
+                            df = pandas.read_html(driver.page_source)
+                            df = df[5] # Need the 5th table
+                        # Drop useless columns and rows to neaten the output dataframe
+                        df = df.drop([0,1,2,3,5,6,7,8,9], axis = 0) 
+                        df = df.drop([1,2,3,5,7,8], axis = 1)
+                        df = df.dropna()
+                        #print(df) Testing output
+                        # Write the dataframe to a new salary csv for the player.
+                        with open(os.path.join(SALARIES_DIRECTORY, (filename)), 'w', newline='', encoding='utf-8') as f:  # Create a CSV for the current team
+                            df.to_csv(f,index = False, header = False) # Append the new table of data to the CSV fil
+                        break # Break and go to the next elemnt
+            else:
+                # Name after L
+                for option in K_to_Z_Select.find_elements_by_tag_name('option'): # Loop through each option until a match is found
+                    if option == None: # If no match is found, eventually will get a nonetype and then prompt to the user that the player could not be found
+                        print("PLAYER NOT LISTED")
+                        break
+                    if (name.upper() in option.text.upper()):
+                        option.click() # If the name matches the current option
+                        #print("Found" + option.text) Testing output 
+                        driver.find_element_by_xpath("/html/body/font/center/font/font[1]/p/a/table/tbody/tr/td/table/tbody/tr[2]/td[2]/form/input").click() # Click the go button to go to the players stats page.
+                        # Try except in case the element is not found on the first try   
+                        try: # If the option is there and can be clicked, click it
+                            if(driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a")): # Expand to show the full season history
+                                driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a").click()
+                        except: # Try again after waiting 1 second.
+                            time.sleep(1)
+                            if(driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a")): # Expand to show the full season history
+                                driver.find_element_by_xpath("/html/body/font/center/font/font/table/tbody/tr[2]/td/center[1]/a").click()
+                                #print("GOT IT IN THE ELSE LOOP") Testing output         
+                        try: # Same thing, tries again if the code fails on the first time
+                            df = pandas.read_html(driver.page_source)
+                            df = df[5]
+                        except: # Wait 1 second and then try again
+                            time.sleep(1)
+                            df = pandas.read_html(driver.page_source)
+                            df = df[5] # Need the 5th table
+                        # Drop useless columns and rows to neaten the output dataframe
+                        df = df.drop([0,1,2,3,5,6,7,8,9], axis = 0)
+                        df = df.drop([1,2,3,5,7,8], axis = 1)
+                        df = df.dropna()
+                        #print(df) Testing output
+                        with open(os.path.join(SALARIES_DIRECTORY, (filename)), 'w', newline='', encoding='utf-8') as f:  # Create a CSV for the current team
+                            df.to_csv(f,index=False, header = True) # Append the new table of data to the CSV fil
+                        break # Break and go to the next elemnt
+
+# Used in the FSOLG Program
 def web_scrape(first_run, scrape_start, scrape_end, num_games, scrape_strat):
 
     start_time = time.time()
-    if(first_run == True):
+    if first_run:
         init_csvs()
 
-    if(scrape_strat == True):
+    if scrape_strat:
         scrape([scrape_start, scrape_end])
 
-    if(scrape_strat == False):
+    if not scrape_strat:
         scrape_games(num_games, 2020)
 
     print("Execution time: " + str((time.time() - start_time)))
 
+# Used for testing
 def main():
     start_time = time.time()
     #init_csvs()
-    scrape([2020,2019,2018])
+    #scrape([2020,2019,2018])
+    salary_scrape();
     print("Execution time: " + str((time.time() - start_time)))
-
-
-if __name__ == '__main__':
-    main()
-#TODO
-# Scrape any info needed for the teams. Determine this with clients and Colin, taking out what will be unnecessary.
-# Write column headers during initialization instead of reading in headers
+    
+#if __name__ == '__main__':
+    #main()
+# TODO
 # Scrape injuries
-# Make sure to prompt the user that when they use the init functions, any existing CSVs will be overwritten.

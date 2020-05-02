@@ -12,7 +12,10 @@ from funcy import identity
 from pyfiglet import Figlet
 
 # Connecting to the web scraper
+from Projector import generate, generate_averages
 from Scrapper import web_scrape
+
+# Connecting to the point projector
 
 
 def simple_CLI():
@@ -41,7 +44,7 @@ def simple_CLI():
     print("What would you like to do with Basketball?")
     print("A) Update Data \n"
           "B) Retrain Machine Learning Algorithm \n"
-          "C) Generate a fantasy lineup")
+          "C) Generate fantasy projectors")
     curr_input = input("\nEnter the letter of the option: ")
 
     if curr_input.lower() == ("A").lower():
@@ -55,15 +58,15 @@ def simple_CLI():
         retrainData()
 
     elif curr_input.lower() == ("C").lower():
-        print("Specified operation: Generate a fantasy lineup")
+        print("Specified operation: Generate fantasy point projections")
         current_operation = "generate"
-        generateLineup()
+        generateProjections()
 
     # Defaulting to lineup generation allows for quicker obtainment of lineups
     else:
-        print("Unrecognized operation, defaulting to lineup generation")
+        print("Unrecognized operation, defaulting to fantasy point projection generation")
         current_operation = "generate"
-        generateLineup()
+        generateProjections()
 
 
 def updateData():
@@ -139,22 +142,56 @@ def retrainData():
     # Machine Learning Component is connected here
     # train(training_size)
 
-def generateLineup():
-    """Generate the fantasy lineup with current ML model
-    @return: Fantasy lineup in list form printed to console
+def generateProjections():
+    """Generate the fantasy projections with current statistics
+    @return: Fantasy projections will be presented in order to the screen
     """
 
     print("-----------------------------------------------------")
     print("")
+    print("Is this the first time you are generating projections?")
+    print("Answering yes will auto generate the needed data")
+    first_check = input("Yes or No?  \n"
+                        "   ")
+    print("-----------------------------------------------------")
+
+    if first_check.lower() == ("yes").lower():
+        print("Generating relevant statistics...")
+        generate_averages()
+
+    print("-----------------------------------------------------")
+    print("")
     # Fantasy site determines pricing for the algorithm
-    print("Please specify the Fantasy draft website or application being used for the lineup.")
-    fantasy_site = input("(A) DraftKings or "
-                          "(B) FanDuel"
+    print("Please specify the Fantasy draft website or application being used for the generation.")
+    fantasy_check = input("(A) DraftKings "
+                          "(B) FanDuel "
                           ":   ")
     print("-----------------------------------------------------")
-    # Machine Learning Component is connected here
-    # generate_Lineup(fantasy_site)
-    # It will return a list of players that will be printed here in the CLI
+
+    if fantasy_check.lower() == ("a").lower():
+        fantasy_site = 2
+
+    if fantasy_check.lower() == ("b").lower():
+        fantasy_site = 1
+
+    print("")
+    print("-----------------------------------------------------")
+    print("Would you like to generate by a single week, two weeks, or all data")
+    gen_check = input("(A) Single week \n"
+                         "(B) Two weeks \n"
+                         "(C) All data \n"
+                         "   ")
+
+    if gen_check.lower() == ("a").lower():
+        scrape_strat = 1
+
+    if gen_check.lower() == ("b").lower():
+        scrape_strat = 2
+
+    if gen_check.lower() == ("c").lower():
+        scrape_strat = 3
+
+    generate(fantasy_site, scrape_strat)
 
 # Defining the CLI command that operates the program (the default advanced CLI)
 @click.command()
@@ -251,9 +288,9 @@ def process(verbose, basketball, update, retrain, generate, simple):
             retrainData()
 
         elif generate:
-            verbose_print("Specified operation detected: generate lineup")
+            verbose_print("Specified operation detected: generate projections")
             current_operation = "generate"
-            generateLineup()
+            generateProjections()
 
         else:
             print("Specified operation not detected, closing the program...")

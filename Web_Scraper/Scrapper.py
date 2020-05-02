@@ -439,7 +439,7 @@ def main():
     salary_scrape();
     print("Execution time: " + str((time.time() - start_time)))
     
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+    #main()
 # TODO
 # Scrape injuries

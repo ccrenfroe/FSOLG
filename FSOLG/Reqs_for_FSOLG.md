@@ -27,6 +27,8 @@ is installed locally. The following steps should allow for running the CLI.
 
 #### Instructions for Running
 
+- Follow directions to install the required components needed for the webscraper
+- Follow above directions for compilation of CLI components
 - CD into the repo in which FSOLG.py is contained
 - Enter "FSOLG.py [OPTIONAL FLAGS]" in the console and hit enter!
 
@@ -37,6 +39,3 @@ https://github.com/pallets/click
 
 https://github.com/pwaller/pyfiglet/
 
-## TODO
-
-* Connect the machine learning component
